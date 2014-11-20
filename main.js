@@ -8,11 +8,9 @@ function initialize()
 {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 13,
-    center: new google.maps.LatLng(40.75, -73.95),
+    center: new google.maps.LatLng(40.75, -73.97),
     mapTypeId: google.maps.MapTypeId.ROADMAP,
   });
-
-  drawStop(40.730634, -73.990565, '#008800');
 
   drawSubwayLine(6, '#008800');
   drawSubwayLine('R', '#bbbb00');
@@ -56,38 +54,7 @@ function drawSubwayLine(line, color) {
 function drawStop(lat,lng,color) {
   var RADIUS = 400;
 
-  var axisTiltRadians = axisTiltDegress/180.0*Math.PI;
-  var longSide  = RADIUS*Math.cos(axisTiltRadians);
-  var shortSide = RADIUS*Math.sin(axisTiltRadians);
-
-  var n = new google.maps.LatLng(lat + longSide*latitudePerMeter,
-                                 lng + shortSide*longitudePerMeter);
-  var w = new google.maps.LatLng(lat + shortSide*latitudePerMeter,
-                                 lng - longSide*longitudePerMeter);
-  var s = new google.maps.LatLng(lat - longSide*latitudePerMeter,
-                                 lng - shortSide*longitudePerMeter);
-  var e = new google.maps.LatLng(lat - shortSide*latitudePerMeter,
-                                 lng + longSide*longitudePerMeter);
-
-  var corners = [n,w,s,e];
-
-  //new google.maps.Circle({
-  //  center: n, radius: 10, strokeColor: color, strokeOpacity: 1,
-  //  strokeWeight: 5, fillColor: color, fillOpacity: 1, map: map,
-  //});
-  //new google.maps.Circle({
-  //  center: s, radius: 10, strokeColor: color, strokeOpacity: 1,
-  //  strokeWeight: 5, fillColor: color, fillOpacity: 1, map: map,
-  //});
-  //new google.maps.Circle({
-  //  center: e, radius: 10, strokeColor: color, strokeOpacity: 1,
-  //  strokeWeight: 5, fillColor: color, fillOpacity: 1, map: map,
-  //});
-  //new google.maps.Circle({
-  //  center: w, radius: 10, strokeColor: color, strokeOpacity: 1,
-  //  strokeWeight: 5, fillColor: color, fillOpacity: 1, map: map,
-  //});
-
+  // draw a circular dot at the center
   new google.maps.Circle({
     center: new google.maps.LatLng(lat,lng),
     radius: 10,
@@ -100,21 +67,12 @@ function drawStop(lat,lng,color) {
     map: map,
   });
 
-  //new google.maps.Circle({
-  //  center: new google.maps.LatLng(lat,lng),
-  //  radius: 400,
-  //  strokeColor: color,
-  //  strokeOpacity: 0.5,
-  //  strokeWeight: 2,
-  //  fillColor: color,
-  //  fillOpacity: 0.15,
-  //  map: map,
-  //});
-
+  // draw a Manhattan circle (tilted diamond), showing all quarter-mile areas
+  //
+  // ...
+  // hehe. get it. "Manhattan" circle because this is a map of "Manhattan".
   new google.maps.Polygon({
-    paths: corners,
-    //center: new google.maps.LatLng(lat,lng),
-    //radius: 400,
+    paths: this.getManhattanCircleCorners(lat, lng, RADIUS),
 
     strokeColor: color,
     strokeOpacity: 0.5,
@@ -123,6 +81,23 @@ function drawStop(lat,lng,color) {
     fillOpacity: 0.15,
     map: map,
   });
+}
+
+function getManhattanCircleCorners(lat, lng, radius) {
+  var axisTiltRadians = axisTiltDegress/180.0*Math.PI;
+  var longSide  = radius*Math.cos(axisTiltRadians);
+  var shortSide = radius*Math.sin(axisTiltRadians);
+
+  var n = new google.maps.LatLng(lat + longSide*latitudePerMeter,
+                                 lng + shortSide*longitudePerMeter);
+  var w = new google.maps.LatLng(lat + shortSide*latitudePerMeter,
+                                 lng - longSide*longitudePerMeter);
+  var s = new google.maps.LatLng(lat - longSide*latitudePerMeter,
+                                 lng - shortSide*longitudePerMeter);
+  var e = new google.maps.LatLng(lat - shortSide*latitudePerMeter,
+                                 lng + longSide*longitudePerMeter);
+
+  return [n,w,s,e];
 }
 
 
