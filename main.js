@@ -1,18 +1,17 @@
 var map;
 
-var latitudePerMeter  = 1/111049.43673993941;
-var longitudePerMeter = 1/84426.94296769376;
-var axisTiltDegress = 29;
+var metersPerLat = 111049.43673993941;
+var metersPerLng = 84426.94296769376;
+var axisTiltRadians = 29 * Math.PI/180;
 
-function initialize()
-{
+function initialize() {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 13,
     center: new google.maps.LatLng(40.75, -73.97),
     mapTypeId: google.maps.MapTypeId.ROADMAP,
   });
 
-  drawSubwayLine(6, '#008800');
+  drawSubwayLine( 6 , '#008800');
   drawSubwayLine('R', '#bbbb00');
   drawSubwayLine('L', '#888888');
 
@@ -27,7 +26,31 @@ function initialize()
   drawNeighborhoodPolygon(stuyvesantTown);
   drawNeighborhoodPolygon(upperEastSide);
   drawNeighborhoodPolygon(westVillage);
+
+  testManhattanDist();
 }
+
+function testManhattanDist() {
+  var lat = 40.740634;
+  var lng = -73.980565;
+  var delta = 0.001;
+  var amount = 30;
+  for (var d1 = lat - delta*amount;
+           d1 <= lat + delta*amount;
+           d1 += delta) {
+    for (var d2 = lng - delta*amount;
+             d2 <= lng + delta*amount;
+             d2 += delta) {
+      var d = getDistanceToNearestSubwayStop(d1, d2);
+      var color = (d <= 400) ? '#f00' : '#000';
+      drawDot(d1, d2, color);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// API
+// -----------------------------------------------------------------------------
 
 function drawNeighborhoodPolygon(data) {
   function makeCoords(arr) {
@@ -46,15 +69,18 @@ function drawNeighborhoodPolygon(data) {
 }
 
 function drawSubwayLine(line, color) {
-  subwayData
-    .filter(function(struct){ return struct.lines.indexOf(line) !== -1; })
+  getAllSubwayStructsForLines([line])
     .map(function(struct){ drawStop(struct.lat, struct.lng, color); });
 }
 
-function drawStop(lat,lng,color) {
-  var RADIUS = 400;
+function getDistanceToNearestSubwayStop(lat, lng, subwayLines) {
+  subwayLines = subwayLines || [6, 'R', 'L'];
+  return getAllSubwayStructsForLines(subwayLines)
+    .map(function(s){ return manhattanDistMeters(lat,lng,s.lat,s.lng); })
+    .reduce(function(a,b){ return Math.min(a,b); });
+}
 
-  // draw a circular dot at the center
+function drawDot(lat,lng,color) {
   new google.maps.Circle({
     center: new google.maps.LatLng(lat,lng),
     radius: 10,
@@ -66,6 +92,17 @@ function drawStop(lat,lng,color) {
     fillOpacity: 1,
     map: map,
   });
+}
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+function drawStop(lat,lng,color) {
+  var RADIUS = 400;
+
+  // draw a circular dot at the center
+  drawDot(lat, lng, color);
 
   // draw a Manhattan circle (tilted diamond), showing all quarter-mile areas
   //
@@ -84,20 +121,39 @@ function drawStop(lat,lng,color) {
 }
 
 function getManhattanCircleCorners(lat, lng, radius) {
-  var axisTiltRadians = axisTiltDegress/180.0*Math.PI;
   var longSide  = radius*Math.cos(axisTiltRadians);
   var shortSide = radius*Math.sin(axisTiltRadians);
 
-  var n = new google.maps.LatLng(lat + longSide*latitudePerMeter,
-                                 lng + shortSide*longitudePerMeter);
-  var w = new google.maps.LatLng(lat + shortSide*latitudePerMeter,
-                                 lng - longSide*longitudePerMeter);
-  var s = new google.maps.LatLng(lat - longSide*latitudePerMeter,
-                                 lng - shortSide*longitudePerMeter);
-  var e = new google.maps.LatLng(lat - shortSide*latitudePerMeter,
-                                 lng + longSide*longitudePerMeter);
+  var n = new google.maps.LatLng(lat + longSide/metersPerLat,
+                                 lng + shortSide/metersPerLng);
+  var w = new google.maps.LatLng(lat + shortSide/metersPerLat,
+                                 lng - longSide/metersPerLng);
+  var s = new google.maps.LatLng(lat - longSide/metersPerLat,
+                                 lng - shortSide/metersPerLng);
+  var e = new google.maps.LatLng(lat - shortSide/metersPerLat,
+                                 lng + longSide/metersPerLng);
 
   return [n,w,s,e];
+}
+
+function getAllSubwayStructsForLines(lines) {
+  return subwayData.filter(function(s){
+    return lines.some(function(l){
+      return s.lines.indexOf(l) > -1;
+    });
+  });
+}
+
+function manhattanDistMeters(lat1, lng1, lat2, lng2) {
+  var dy = (lat1 - lat2) * metersPerLat;
+  var dx = (lng1 - lng2) * metersPerLng;
+
+  var dist = Math.sqrt(dy*dy + dx*dx);
+  var dAngle = Math.atan2(dy, dx);
+
+  var projAngle = Math.PI/2 - (axisTiltRadians + dAngle);
+
+  return dist * (Math.abs(Math.sin(projAngle)) + Math.abs(Math.cos(projAngle)));
 }
 
 
