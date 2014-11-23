@@ -26,26 +26,6 @@ function initialize() {
   drawNeighborhoodPolygon(stuyvesantTown);
   drawNeighborhoodPolygon(upperEastSide);
   drawNeighborhoodPolygon(westVillage);
-
-  testManhattanDist();
-}
-
-function testManhattanDist() {
-  var lat = 40.740634;
-  var lng = -73.980565;
-  var delta = 0.001;
-  var amount = 30;
-  for (var d1 = lat - delta*amount;
-           d1 <= lat + delta*amount;
-           d1 += delta) {
-    for (var d2 = lng - delta*amount;
-             d2 <= lng + delta*amount;
-             d2 += delta) {
-      var d = getDistanceToNearestSubwayStop(d1, d2);
-      var color = (d <= 400) ? '#f00' : '#000';
-      drawDot(d1, d2, color);
-    }
-  }
 }
 
 // -----------------------------------------------------------------------------
