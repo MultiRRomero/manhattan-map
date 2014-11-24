@@ -131,7 +131,7 @@ function manhattanDistMeters(lat1, lng1, lat2, lng2) {
   var dist = Math.sqrt(dy*dy + dx*dx);
   var dAngle = Math.atan2(dy, dx);
 
-  var projAngle = Math.PI/2 - (axisTiltRadians + dAngle);
+  var projAngle = dAngle + axisTiltRadians; // rotate map so axis is vertical
 
   return dist * (Math.abs(Math.sin(projAngle)) + Math.abs(Math.cos(projAngle)));
 }
