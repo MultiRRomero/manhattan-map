@@ -11,9 +11,9 @@ function initialize() {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
   });
 
-  drawSubwayLine( 6 , '#008800');
-  drawSubwayLine('R', '#bbbb00');
-  drawSubwayLine('L', '#888888');
+  drawSubwayLine( 6 , '#008800'); // green(50%)
+  drawSubwayLine('R', '#bbbb00'); // yellow(75%)
+  drawSubwayLine('L', '#888888'); // gray(50%)
 
   drawNeighborhoodPolygon(chelsea);
   drawNeighborhoodPolygon(eastVillage);
