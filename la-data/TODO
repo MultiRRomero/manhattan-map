@@ -1,0 +1,47 @@
+PLANS:
+
+My ATL room: 13' x 11'3" (or 12'9" by 11'2" not including woodwork)
+
+Data sources:
+- Craigslist
+- Renthop
+- NYBits
+
+Craigslist:
+- http://newyork.craigslist.org/jsonsearch/nfb/mnh?query=doorman&hasPic=1&nh=121&nh=129&nh=130&nh=139&nh=128&maxAsk=4200&bedrooms=1
+- and then resolve cluster:
+- http://newyork.craigslist.org/jsonsearch/nfb/mnh?query=doorman&hasPic=1&nh=121&nh=129&nh=130&nh=139&nh=128&maxAsk=4200&bedrooms=1&geocluster=113006708418&key=fhbmFsBQ-JuLz9_UXO4Uuw
+- for full page, need to find:
+    <section id="postingbody">
+    ...
+    </section>
+    and strip out tags within ...
+    and replace multiple newlines with 1 and multiple spaces with 1
+    and remove tabs
+- missing: SQFT, A/C, Fitness center, elevator -> just do text search?
+
+NYBits:
+- missing: fitness, A/C, elevator
+
+Plan:
+- Get apartment data
+- Get Subway data
+- Hard-code subway lines
+- Define distance function and filter apartment data to be within distance of subway stops
+- Output tab separated txt so can view excel spreadsheet
+
+
+Columns:
+- Title
+- Price
+- URL
+- Fee / no fee
+- Lat/long
+- Posting date
+- SQFT
+~ A/C
+~ Fitness center
+~ Elevator
+~ Blurb
+
+http://www.brickunderground.com/blog/2012/01/8_best_websites_for_finding_a_no_fee_apt_in_new_york_city
