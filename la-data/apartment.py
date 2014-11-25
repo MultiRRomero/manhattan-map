@@ -106,6 +106,10 @@ class Apartment:
         self.blurb = blurb
         return self
 
-    def __str__(self):
+    def get_str_lines(self):
         price = self.price if self.has_fee != True else '%d*' % self.price
-        return '%s\t%s\n\t%s' % (str(price), self.title, self.url)
+        return ('%s\t%s' % (str(price), self.title),
+                '\t%s'   % (self.url))
+
+    def __str__(self):
+        return '\n'.join(self.get_str_lines())

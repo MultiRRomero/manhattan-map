@@ -33,19 +33,39 @@ def main(data_source, output, distance):
         pass
 
 def _print_out(listings):
-    by_subway = {}
-    for listing in listings:
-        stop = listing.stop['stop']
-        if not stop in by_subway:
-            by_subway[stop] = []
-        by_subway[stop].append(listing)
+    aggregated = _aggregate_by(listings,
+                               lambda l: l.stop['stop'],
+                               lambda l: (l.price,l.has_fee,l.title)) # for now, these 3 fields
 
-    for stop in by_subway:
-        by_subway[stop].sort(key=lambda listing: listing.price)
+    for stop in aggregated:
         print '===== %s =====' % stop
-        for listing in by_subway[stop]:
-            print str(listing)
+
+        price_fee_title_s = aggregated[stop].keys()
+        price_fee_title_s.sort()
+
+        for price_fee_title in price_fee_title_s:
+            for listing in aggregated[stop][price_fee_title]:
+                if listing is aggregated[stop][price_fee_title][0]: # first
+                    print listing.get_str_lines()[0] # print first line (price+fee+title)
+                print listing.get_str_lines()[1] # print second line (url)
+            print
         print '\n'
+            
+        #aggregated[stop].sort(key=lambda listing: listing.price)
+
+def _aggregate_by(array, *fns):
+  ret = {}
+  for elem in array:
+    keys = map(lambda fn: fn(elem), fns)
+
+    obj = ret
+    for k in keys:
+      if k not in obj:
+        obj[k] = {} if (k is not keys[-1]) else [] # if last key, then array
+      obj = obj[k]
+
+    obj.append(elem)
+  return ret
     
 def _get_listings():
     loaders = [
