@@ -38,6 +38,18 @@ xxx 1. Fix timestamp / Add address
 5. deploy
 
 
+Renthop:
+- Search page:
+  - Title
+  - Price
+  - posting date ish
+  - URL
+- Details page:
+  - Blurb
+  - Lat/long
+  - Address
+  - Fee
+
 Columns:
 - Title
 - Price
