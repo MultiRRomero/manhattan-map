@@ -1,9 +1,11 @@
 import json
 
 from apartment import Apartment
-from browser import get_browser
+from browser import get_browser, open_page
 from craigslist_constants import Neighborhoods, Fees
 import html_helper
+
+SOURCE = 'craigslist'
 
 MAX_PRICE = 4300
 NEIGHBORHOODS = [
@@ -41,11 +43,7 @@ class CLDataLoader:
             params = '%s&%s' % (url_part[url_part.find('?') + 1:], params)
         url = CL_URL % (fee, params)
 
-        resp = self._browser.open(url)
-        s = resp.read()
-        s = s.decode('utf-8', 'replace').encode('ascii', 'replace')
-        resp.close()
-
+        s = open_page(self._browser, url)
         return self._format_data(fee, json.loads(s)[0])
 
     def _format_data(self, fee, list):
@@ -62,6 +60,7 @@ class CLDataLoader:
                 continue
 
             apartment = Apartment(
+                SOURCE,
                 item['PostingTitle'],
                 int(float(item['Ask'])),
                 BASE_URL + item['PostingURL'])
@@ -88,14 +87,14 @@ class CLDataLoader:
         return listings
 
     def _load_more_data(self, listing):
-        resp = self._browser.open(listing.url)
-        s = resp.read()
-        s = s.decode('utf-8', 'replace').encode('ascii', 'replace')
-        resp.close()
+        if listing.is_fully_loaded():
+            return
+        s = open_page(self._browser, listing.url)
 
         (section, s) = html_helper.find_in_between(s, SECTION_MARKER, SECTION_END)
         section = html_helper.strip_tags(section)
         listing.set_blurb(section)
+        listing.save_to_db()
 
 if __name__ == '__main__':
     listings = CLDataLoader().load_data()

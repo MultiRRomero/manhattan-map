@@ -1,9 +1,11 @@
 import datetime
 
 from apartment import Apartment
-from browser import get_browser
-from geocode import get_latlong
+from browser import get_browser, open_page
+from geocode import get_address
 import html_helper
+
+SOURCE = 'renthop'
 
 MIN_PRICE = 2300
 MAX_PRICE = 4300
@@ -61,9 +63,7 @@ class RenthopLoader:
         return BASE_URL + all
 
     def _load_page(self, page):
-        resp = self._br.open(self._get_url(page))
-        s = resp.read()
-        resp.close()
+        s = open_page(self._br, self._get_url(page))
 
         (total_pages, s) = html_helper.advance_and_find(s, PAGE_PLACE_MARKER, 'of', '(')
         total_pages = int(total_pages.strip())
@@ -91,7 +91,7 @@ class RenthopLoader:
         recency = html_helper.strip_tags(recency).lower()
         dt = self._understand_recency(recency)
 
-        listing = Apartment(title, price, url)
+        listing = Apartment(SOURCE, title, price, url)
         listing.set_posting_date(dt.strftime('%s'))
         return (listing, s)
 
@@ -114,9 +114,9 @@ class RenthopLoader:
         return now
 
     def _load_details(self, listing):
-        resp = self._br.open(listing.url)
-        s = resp.read()
-        resp.close()
+        if listing.is_fully_loaded():
+            return
+        s = open_page(self._br, listing.url)
 
         (features, s) = html_helper.find_in_between(s, 'Features &amp; Amenities', '<div style="width: 640px')
         blurb = html_helper.strip_tags(features.replace('<td', '\n<td'))
@@ -132,7 +132,9 @@ class RenthopLoader:
         (address, s) = html_helper.find_in_between(s, "var report_listing_address = '", "'")
         (long, s) = html_helper.find_in_between(s, "longitude = '", "'")
         (lat, s) = html_helper.find_in_between(s, "latitude = '", "'")
+        address = get_address(lat, long)
         listing.set_location(lat, long, address)
+        listing.save_to_db()
 
     def load_data(self):
         (listings, total_pages) = self._load_page(1)

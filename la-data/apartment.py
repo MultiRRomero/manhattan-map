@@ -1,26 +1,66 @@
 import datetime
 
+from db_store import DBStore
 from geocode import get_address
 
 """
 " Just a simple class to keep namings between different apartment features consistent
 """
 
+db = DBStore()
+
 class Apartment:
-    def __init__(self, title, price, url):
+    def __init__(self, source, title, price, url):
         self.title = title
         self.price = price
         self.url = url
+        self.source = source
+        self._init_from_db()
 
-        # Defaults
-        self.latitude = None
-        self.longitude = None
-        self.address = None
-        self.has_fee = None
-        self.blurb = ''
-        self.posting_date = None
-        self.posting_timestamp = None # TODO
-        self.sqft = -1
+    def _init_from_db(self):
+        global db
+        data = db.get_apartment_full_data(self.url)
+        if data == None:
+            self.latitude = None
+            self.longitude = None
+            self.address = None
+            self.has_fee = None
+            self.blurb = ''
+            self.posting_date = None
+            self.sqft = -1
+            self.address_id = None
+            self._has_full_data = False
+        else:
+            self._init_address_from_db(data[0])
+            self.has_fee = data[1]
+            self.blurb = data[2]
+            self.posting_date = data[3]
+            self.sqft = data[4]
+            self._has_full_data = True
+
+    def _init_address_from_db(self, address_id):
+        global db
+        data = db.get_address_from_id(address_id)
+        self.address_id = address_id
+        self.latitude = data[0]
+        self.longitude = data[1]
+        self.address = data[2]
+
+    def get_address_id(self):
+        if self.address_id != None:
+            return self.address_id
+        global db
+        data = db.get_id_for_address(self.latitude, self.longitude, self.address)
+        self.address_id = None if data == None else data[0]
+        return self.address_id
+
+    def is_fully_loaded(self):
+        return self._has_full_data
+
+    def save_to_db(self):
+        global db
+        self._has_full_data = True
+        db.save_apartment(self)
 
     def set_location(self, latitude, longitude, address=None):
         self.latitude = latitude

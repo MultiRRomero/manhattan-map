@@ -12,6 +12,60 @@ class DBStore:
             )
         self._conn.commit()
 
+    def save_apartment(self, apartment):
+        self._conn.execute(
+            'INSERT INTO apartments ' +
+            '(source, title, price, url, address_id, has_fee, blurb, posting_date, sqft) ' +
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ',
+            (apartment.source,
+             apartment.title,
+             apartment.price,
+             apartment.url,
+             apartment.get_address_id(),
+             apartment.has_fee,
+             apartment.blurb,
+             apartment.posting_date,
+             apartment.sqft)
+            )
+        self._conn.commit()
+
+    # TODO: Call this and test that it actually works!!!
+    def save_transaction(self, apartments):
+        timestamp = int(datetime.datetime.now().strftime('%s'))
+        log_values = map(
+            lambda a: (timestamp, self.get_apartment_id(a)),
+            apartments)
+        self._conn.executemany(
+            'INSERT INTO search_log (timestamp, apartment_id) VALUES (?, ?)',
+            log_values
+            )
+        self._conn.commit()
+
+    def get_apartment_full_data(self, url):
+        cursor = self._conn.execute(
+            'SELECT address_id, has_fee, blurb, posting_date, sqft ' +
+            'FROM apartments WHERE url=?',
+            (url, )
+            )
+        return cursor.fetchone()
+
+    def get_address_from_id(self, id):
+        cursor = self._conn.execute(
+            'SELECT latitude, longitude, address FROM addresses WHERE id=?',
+            (id, )
+            )
+        return cursor.fetchone()
+
+    def get_id_for_address(self, lat, long, address):
+        if lat != None and long != None:
+            sql = 'SELECT id FROM addresses WHERE latitude=? AND longitude=?'
+            data = (lat, long)
+        else:
+            sql = 'SELECT id FROM addresses WHERE address=?'
+            data = (address,)
+        cursor = self._conn.execute(sql, data)
+        return cursor.fetchone()
+
     def get_coords(self, address):
         cursor = self._conn.execute(
             'SELECT latitude, longitude FROM addresses WHERE address=?',

@@ -1,9 +1,11 @@
 import time
 
 from apartment import Apartment
-from browser import get_browser
+from browser import get_browser, open_page
 from geocode import get_latlong
 import html_helper
+
+SOURCE = 'nybits'
 
 MAX_PRICE = 4300
 NEIGHBORHOODS = [
@@ -43,9 +45,7 @@ class NYBitsLoader:
         return '&'.join(params)
 
     def _call_internets(self):
-        resp = self._br.open(self._url)
-        s = resp.read()
-        resp.close()
+        s = open_page(self._br, self._url)
         return self._format(s)
 
     def _get_fields(self, s):
@@ -69,7 +69,7 @@ class NYBitsLoader:
         start = end_listing.rfind('  ')
         posting_date = end_listing[start:].strip()
 
-        listing = Apartment(title, price, link)
+        listing = Apartment(SOURCE, title, price, link)
         listing.set_has_fee(not no_fee)
         listing.set_posting_date(posting_date)
         return (listing, s)
@@ -84,9 +84,9 @@ class NYBitsLoader:
         return listings
 
     def _load_more_listing_data(self, listing):
-        resp = self._br.open(listing.url)
-        s = resp.read()
-        resp.close()
+        if listing.is_fully_loaded():
+            return listing
+        s = open_page(self._br, listing.url)
 
         pos = s.find(SQFT_MARKER)
         if pos >= 0:
@@ -102,6 +102,7 @@ class NYBitsLoader:
             (blurb, s) = html_helper.find_in_between(s[pos:], ':', '<div class="cleanbreakdiv">')
             listing.set_blurb(html_helper.strip_tags(blurb))
 
+        listing.save_to_db()
         return listing
     
     def _set_formatted_address(self, address, listing):

@@ -63,4 +63,16 @@ Columns:
 ~ Elevator
 ~ Blurb
 
+Database:
+- want apartment data table with ID
+- want history table to tell when we find an entry and point to apartment data
+
+How this will work:
+- when run, need to associate permalink with an item
+- if no item, then save the entry
+
+- when create apartment with URL, try to fill with DB
+- have function has_full_data + save_full_data
+- have separate script to call all data sources and save transactions
+
 http://www.brickunderground.com/blog/2012/01/8_best_websites_for_finding_a_no_fee_apt_in_new_york_city

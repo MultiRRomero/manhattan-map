@@ -62,6 +62,8 @@ def _get_geo_address(lat, long):
         try:
             location = geocoder.reverse('%s, %s' % (lat, long))
             if location != None:
+                if isinstance(location, type([])):
+                    return location[0].address
                 return location.address
         except:
             pass
