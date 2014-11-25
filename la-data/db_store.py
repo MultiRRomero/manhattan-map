@@ -81,3 +81,14 @@ class DBStore:
         results = cursor.fetchone()
         return None if results == None else results[0]
 
+    """ This is for debugging """
+    def get_all_stored_listings(self):
+        from apartment import Apartment
+        listings = []
+
+        cursor = self._conn.execute('SELECT source, title, price, url FROM apartments')
+        while True:
+            data = cursor.fetchone()
+            if data == None: break
+            listings.append(Apartment(data[0], data[1], data[2], data[3]))
+        return listings

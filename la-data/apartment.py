@@ -2,6 +2,7 @@ import datetime
 
 from db_store import DBStore
 from geocode import get_address
+from manhattan_dist import get_distance_to_nearest_subway_stop
 
 """
 " Just a simple class to keep namings between different apartment features consistent
@@ -29,6 +30,8 @@ class Apartment:
             self.posting_date = None
             self.sqft = -1
             self.address_id = None
+            self.stop_distance = None
+            self.stop = None
             self._has_full_data = False
         else:
             self._init_address_from_db(data[0])
@@ -42,9 +45,15 @@ class Apartment:
         global db
         data = db.get_address_from_id(address_id)
         self.address_id = address_id
-        self.latitude = data[0]
-        self.longitude = data[1]
+        self.latitude = float(data[0])
+        self.longitude = float(data[1])
         self.address = data[2]
+        self._init_distance()
+
+    def _init_distance(self):
+        (distance, stop) = get_distance_to_nearest_subway_stop(self.latitude, self.longitude)
+        self.stop_distance = distance
+        self.stop = stop
 
     def get_address_id(self):
         if self.address_id != None:
@@ -63,12 +72,13 @@ class Apartment:
         db.save_apartment(self)
 
     def set_location(self, latitude, longitude, address=None):
-        self.latitude = latitude
-        self.longitude = longitude
+        self.latitude = float(latitude)
+        self.longitude = float(longitude)
 
         if address == None:
             address = get_address(latitude, longitude)
         self.address = address
+        self._init_distance()
         return self
 
     def set_address(self, address):
