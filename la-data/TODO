@@ -30,6 +30,13 @@ Plan:
 - Define distance function and filter apartment data to be within distance of subway stops
 - Output tab separated txt so can view excel spreadsheet
 
+NEXT STEPS:
+xxx 1. Fix timestamp / Add address
+2. More sources? Apartments.com?
+3. distance function
+4. output
+5. deploy
+
 
 Columns:
 - Title

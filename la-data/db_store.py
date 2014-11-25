@@ -19,3 +19,11 @@ class DBStore:
             )
         return cursor.fetchone()
 
+    def get_address(self, lat, long):
+        cursor = self._conn.execute(
+            'SELECT address FROM addresses WHERE latitude=? AND longitude=?',
+            (lat, long)
+            )
+        results = cursor.fetchone()
+        return None if results == None else results[0]
+

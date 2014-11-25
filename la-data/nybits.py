@@ -1,9 +1,8 @@
-import geopy
 import time
 
 from apartment import Apartment
 from browser import get_browser
-from db_store import DBStore
+from geocode import get_latlong
 import html_helper
 
 MAX_PRICE = 4300
@@ -29,19 +28,10 @@ SQFT_MARKER = 'Size (sq/ft)'
 BLDG_MARKER = '<b>Building</b>'
 COMMENTS_MARKER = '<b>Comments</b>'
 
-# Don't read this line:
-API_KEY = 'AIzaSyBYjZNI2mPrku1dsJuv6Rd10cAL0wx3BV0'
-
 class NYBitsLoader:
     def __init__(self):
         self._url = self._get_url()
         self._br = get_browser()
-        self._db = DBStore()
-        self._geos = [
-            geopy.geocoders.ArcGIS(),
-            geopy.geocoders.OpenMapQuest(),
-            geopy.geocoders.GoogleV3(API_KEY),
-            ]
 
     def load_data(self):
         listings = self._call_internets()
@@ -127,33 +117,12 @@ class NYBitsLoader:
         address.replace('\n', ', ')
         address = html_helper.fix_spaces(address)
 
-        location = self._retrieve_address_data(address)
+        location = get_latlong(address)
         if location != None:
-            listing.set_location(location[0], location[1])
+            listing.set_location(location[0], location[1], address)
         else:
+            listing.set_address(address)
             print 'error getting', address, listing.url
-
-    def _retrieve_address_data(self, address):
-        saved_coords = self._db.get_coords(address)
-        if saved_coords != None:
-            return saved_coords
-
-        print 'cache miss', address
-        coords = self._fetch_address_coords(address)
-        if coords != None:
-            self._db.save_address(address, coords[0], coords[1])
-        return coords
-
-    def _fetch_address_coords(self, address):
-        location = None
-        for geocoder in self._geos:
-            try:
-                location = geocoder.geocode(address)
-                if location != None:
-                    return (location.latitude, location.longitude)
-            except:
-                pass
-        return None
 
 if __name__ == '__main__':
     listings = NYBitsLoader().load_data()
