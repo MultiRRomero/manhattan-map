@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 
 class DBStore:
@@ -29,7 +30,6 @@ class DBStore:
             )
         self._conn.commit()
 
-    # TODO: Call this and test that it actually works!!!
     def save_transaction(self, apartments):
         timestamp = int(datetime.datetime.now().strftime('%s'))
         log_values = map(
@@ -65,6 +65,10 @@ class DBStore:
             data = (address,)
         cursor = self._conn.execute(sql, data)
         return cursor.fetchone()
+
+    def get_apartment_id(self, listing):
+        cursor = self._conn.execute('SELECT id FROM apartments WHERE url=?', (listing.url, ))
+        return cursor.fetchone()[0]
 
     def get_coords(self, address):
         cursor = self._conn.execute(

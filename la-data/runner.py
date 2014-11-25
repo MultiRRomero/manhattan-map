@@ -21,6 +21,7 @@ def main(data_source, output, distance):
         listings = _get_test_listings()
     else:
         listings = _get_listings()
+        DBStore().save_transaction(listings)
 
     meters_distance = METERS_IN_MILE * distance
     listings = filter(lambda l: l.stop_distance < meters_distance, listings)
