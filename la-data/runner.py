@@ -41,6 +41,7 @@ def _print_out(listings):
         by_subway[stop].append(listing)
 
     for stop in by_subway:
+        by_subway[stop].sort(key=lambda listing: listing.price)
         print '===== %s =====' % stop
         for listing in by_subway[stop]:
             print str(listing)
