@@ -33,3 +33,14 @@ cd ..
 
 cd ..
 rm -rf __install_tmp
+
+dir=`git rev-parse --git-dir | sed -e "s/\.git/la-data/"`
+db="$dir/apartment_data.db"
+sql="$dir/database.sql"
+
+if ! [ -f $db ];
+then
+  echo 'created';
+  sqlite3 $db < $sql;
+fi
+echo 'done';

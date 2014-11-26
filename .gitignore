@@ -1,6 +1,7 @@
 
 *.pyc
+*.secret
+la-data/apartment_data.db
 la-data/out
 la-data/stuff
 la-data/curl-out*
-*.secret
