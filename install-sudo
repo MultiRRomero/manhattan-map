@@ -1,3 +1,4 @@
 easy_install argparse
 easy_install geopy
 easy_install mechanize
+easy_install termcolor
