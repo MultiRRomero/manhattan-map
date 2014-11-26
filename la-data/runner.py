@@ -17,66 +17,85 @@ MAX_DIST_MILES = .3
 METERS_IN_MILE = 1609.344
 
 def main(data_source, output, distance):
-    if data_source == DATA_SOURCE_TEST:
-        listings = _get_test_listings()
-    else:
-        listings = _get_listings()
-        DBStore().save_transaction(listings)
+  if data_source == DATA_SOURCE_TEST:
+    listings = _get_test_listings()
+  else:
+    listings = _get_listings()
+    DBStore().save_transaction(listings)
 
-    meters_distance = METERS_IN_MILE * distance
-    listings = filter(lambda l: l.stop_distance < meters_distance, listings)
+  meters_distance = METERS_IN_MILE * distance
+  listings = filter(lambda l: l.stop_distance < meters_distance, listings)
 
-    if output == OUTPUT_DEBUG:
-        _print_out(listings)
-    else:
-        # TODO: Implement Real Output
-        pass
+  if output == OUTPUT_DEBUG:
+    _print_out(listings)
+  else:
+    # TODO: Implement Real Output
+    pass
 
 def _print_out(listings):
-    by_subway = {}
-    for listing in listings:
-        stop = listing.stop['stop']
-        if not stop in by_subway:
-            by_subway[stop] = []
-        by_subway[stop].append(listing)
+  aggregated = _aggregate_by(listings,
+                             lambda l: l.stop['stop'],
+                             lambda l: (l.price,l.has_fee,l.title)) # for now, these 3 fields
 
-    for stop in by_subway:
-        print '===== %s =====' % stop
-        for listing in by_subway[stop]:
-            print str(listing)
-        print '\n'
+  for stop in aggregated:
+    print '===== %s =====\n' % stop
+
+    price_fee_title_s = aggregated[stop].keys()
+    price_fee_title_s.sort()
+
+    for price_fee_title in price_fee_title_s:
+      for listing in aggregated[stop][price_fee_title]:
+        if listing is aggregated[stop][price_fee_title][0]: # first
+          print listing.get_str_lines()[0] # print first line (price+fee+title)
+        print listing.get_str_lines()[1] # print second line (url)
+      print
+    print '\n'
+
+def _aggregate_by(array, *fns):
+  ret = {}
+  for elem in array:
+    keys = map(lambda fn: fn(elem), fns)
+
+    container = ret
+    for k in keys:
+      if k not in container:
+        container[k] = {} if (k is not keys[-1]) else [] # if last key, then array
+      container = container[k]
+
+    container.append(elem)
+  return ret
     
 def _get_listings():
-    loaders = [
-        CLDataLoader(),
-        NYBitsLoader(),
-        RenthopLoader(),
-        ]
-    all_listings = map(lambda l: l.load_data(), loaders)
-    return reduce(lambda a, b: a + b, all_listings)
+  loaders = [
+    CLDataLoader(),
+    NYBitsLoader(),
+    RenthopLoader(),
+    ]
+  all_listings = map(lambda l: l.load_data(), loaders)
+  return reduce(lambda a, b: a + b, all_listings)
 
 def _get_test_listings():
-    return DBStore().get_all_stored_listings()
+  return DBStore().get_all_stored_listings()
 
 parser = argparse.ArgumentParser(description='Apartments stuff')
 parser.add_argument(
-    '--source',
-    dest='data_source',
-    default=DATA_SOURCE_TEST,
-    help='[test, real]'
-    )
+  '--source',
+  dest='data_source',
+  default=DATA_SOURCE_TEST,
+  help='[test, real]'
+  )
 parser.add_argument(
-    '--out',
-    dest='output',
-    default=OUTPUT_DEBUG,
-    help='[debug, csv]'
-    )
+  '--out',
+  dest='output',
+  default=OUTPUT_DEBUG,
+  help='[debug, csv]'
+  )
 parser.add_argument(
-    '--within',
-    dest='distance',
-    default=MAX_DIST_MILES,
-    help='Required distance from subway stop (miles)'
-    )
+  '--within',
+  dest='distance',
+  default=MAX_DIST_MILES,
+  help='Required distance from subway stop (miles)'
+  )
 
 args = parser.parse_args()
 main(args.data_source, args.output, float(args.distance))
