@@ -25,5 +25,11 @@ cd termcolor-1.1.0
 python setup.py install --user
 cd ..
 
+curl "https://pypi.python.org/packages/source/g/gspread/gspread-0.2.2.tar.gz#md5=83148c97d7744c89d9a34d53766714d3" > gspread.tar.gz
+tar xvf gspread.tar.gz
+cd gspread-0.2.2
+python setup.py install --user
+cd ..
+
 cd ..
 rm -rf __install_tmp
