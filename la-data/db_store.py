@@ -85,6 +85,15 @@ class DBStore:
     results = cursor.fetchone()
     return None if results == None else results[0]
 
+  def save_annotations(self, annotations):
+    self._conn.executemany(
+      'INSERT INTO annotations ' +
+      '(timestamp, url, rating, comments, contacted) ' +
+      'VALUES (?, ?, ?, ?, ?)',
+      annotations
+      )
+    self._conn.commit()
+
   """ This is for debugging """
   def get_all_stored_listings(self):
     from apartment import Apartment

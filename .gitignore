@@ -3,3 +3,4 @@
 la-data/out
 la-data/stuff
 la-data/curl-out*
+*.secret

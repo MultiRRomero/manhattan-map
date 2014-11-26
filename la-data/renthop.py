@@ -24,7 +24,7 @@ CHOOSE_NEIGHBOORHOODS = [0, 1, 2]
 
 FILTERS = [
   'has_photo',
-  'has_floorplan',
+#  'has_floorplan',
   ]
 FEATURES = [
   'Doorman',
@@ -92,7 +92,7 @@ class RenthopLoader:
     dt = self._understand_recency(recency)
 
     listing = Apartment(SOURCE, title, price, url)
-    listing.set_posting_date(dt.strftime('%s'))
+    listing.set_posting_timestamp(dt.strftime('%s'))
     return (listing, s)
 
   def _understand_recency(self, recency):

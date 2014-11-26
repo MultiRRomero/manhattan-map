@@ -4,6 +4,7 @@ import termcolor
 
 from craigslist import CLDataLoader
 from db_store import DBStore
+from doc_sync import DocSyncer
 from manhattan_dist import get_distance_to_nearest_subway_stop
 from nybits import NYBitsLoader
 from renthop import RenthopLoader
@@ -12,7 +13,7 @@ DATA_SOURCE_TEST = 'test'
 DATA_SOURCE_REAL = 'real'
 
 OUTPUT_DEBUG = 'debug'
-OUTPUT_CSV = 'csv'
+OUTPUT_GOOGLE = 'google'
 
 MAX_DIST_MILES = .3
 METERS_IN_MILE = 1609.344
@@ -30,8 +31,7 @@ def main(data_source, output, distance):
   if output == OUTPUT_DEBUG:
     _print_out(listings)
   else:
-    # TODO: Implement Real Output
-    pass
+    DocSyncer().sync_listings(listings)
 
 def _print_out(listings):
   aggregated = _aggregate_by(listings,
@@ -95,7 +95,7 @@ parser.add_argument(
   '--out',
   dest='output',
   default=OUTPUT_DEBUG,
-  help='[debug, csv]'
+  help='[debug, google]'
   )
 parser.add_argument(
   '--within',

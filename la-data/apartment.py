@@ -8,6 +8,8 @@ from manhattan_dist import get_distance_to_nearest_subway_stop
 " Just a simple class to keep namings between different apartment features consistent
 """
 
+METERS_IN_MILE = 1609.344
+
 db = DBStore()
 
 class Apartment:
@@ -105,6 +107,39 @@ class Apartment:
   def set_blurb(self, blurb):
     self.blurb = blurb
     return self
+
+  """
+  Returns:
+  last seen, url,
+  price, title, stop distance, stop,
+  posting date, has fee, sqft,
+  fitness, a/c, doorman, elevator, laundry,
+  adddress, lat/long,
+  our_rating, comments, contacted
+  """
+  def get_row_values(self, last_seen):
+    blurb = self.blurb.lower()
+    return [
+      last_seen, # last seen
+      self.url,
+      '$%s' % self.price,
+      self.title,
+      '%.3f' % (self.stop_distance / METERS_IN_MILE),
+      self.stop['stop'],
+      self.posting_date,
+      int(self.has_fee),
+      str(self.sqft),
+      int('fitness' in blurb),
+      int('a/c' in blurb or 'air cond' in blurb),
+      int('doorman' in blurb or self.source == 'nybits'),
+      int('elevator' in blurb),
+      int('laundry' in blurb),
+      self.address,
+      '%s,%s' % (str(self.latitude), str(self.longitude)),
+      '0', # rating
+      '', # comments
+      '', # contacted
+      ]
 
   def get_str_lines(self):
     price = self.price if self.has_fee != True else '%d*' % self.price

@@ -26,3 +26,11 @@ CREATE TABLE if not exists search_log (
   timestamp INT NOT NULL,
   apartment_id INT NOT NULL
 );
+
+CREATE TABLE if not exists annotations (
+  timestamp INT NOT NULL,
+  url TEXT NOT NULL,
+  rating INT,
+  comments TEXT,
+  contacted TEXT
+);
