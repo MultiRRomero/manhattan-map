@@ -38,7 +38,7 @@ def _print_out(listings):
                              lambda l: (l.price,l.has_fee,l.title)) # for now, these 3 fields
 
   for stop in aggregated:
-    print '===== %s =====' % stop
+    print '===== %s =====\n' % stop
 
     price_fee_title_s = aggregated[stop].keys()
     price_fee_title_s.sort()
@@ -56,13 +56,13 @@ def _aggregate_by(array, *fns):
   for elem in array:
     keys = map(lambda fn: fn(elem), fns)
 
-    obj = ret
+    container = ret
     for k in keys:
-      if k not in obj:
-        obj[k] = {} if (k is not keys[-1]) else [] # if last key, then array
-      obj = obj[k]
+      if k not in container:
+        container[k] = {} if (k is not keys[-1]) else [] # if last key, then array
+      container = container[k]
 
-    obj.append(elem)
+    container.append(elem)
   return ret
     
 def _get_listings():
