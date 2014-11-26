@@ -138,6 +138,8 @@ class RenthopLoader:
 
   def load_data(self):
     (listings, total_pages) = self._load_page(1)
+    print 'renthop has %d pages' % total_pages
+
     for page in range(2, total_pages + 1):
       (page_listings, _) = self._load_page(page)
       listings += page_listings
