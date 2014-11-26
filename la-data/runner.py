@@ -1,5 +1,6 @@
 import argparse
 import sys
+import termcolor
 
 from craigslist import CLDataLoader
 from db_store import DBStore
@@ -45,9 +46,15 @@ def _print_out(listings):
 
     for price_fee_title in price_fee_title_s:
       for listing in aggregated[stop][price_fee_title]:
+        (first, second) = listing.get_str_lines()
         if listing is aggregated[stop][price_fee_title][0]: # first
-          print listing.get_str_lines()[0] # print first line (price+fee+title)
-        print listing.get_str_lines()[1] # print second line (url)
+          print first # print first line (price+fee+title)
+
+        color = None
+        if 'craigslist.org' in second: color = 'red'
+        if 'renthop.com'    in second: color = 'blue'
+        print termcolor.colored(second, color) # print second line (url)
+
       print
     print '\n'
 
