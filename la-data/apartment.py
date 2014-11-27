@@ -129,7 +129,7 @@ class Apartment:
       self.posting_date,
       int(self.has_fee),
       str(self.sqft),
-      int('fitness' in blurb),
+      int('fitness' in blurb or 'gym' in blurb),
       int('a/c' in blurb or 'air cond' in blurb),
       int('doorman' in blurb or self.source == 'nybits'),
       int('elevator' in blurb),
