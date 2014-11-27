@@ -8,6 +8,7 @@ from doc_sync import DocSyncer
 from manhattan_dist import get_distance_to_nearest_subway_stop
 from nybits import NYBitsLoader
 from renthop import RenthopLoader
+from streeteasy import StreeteasyLoader
 
 DATA_SOURCE_TEST = 'test'
 DATA_SOURCE_REAL = 'real'
@@ -74,6 +75,7 @@ def _aggregate_by(array, *fns):
     
 def _get_listings():
   loaders = [
+    StreeteasyLoader(),
     CLDataLoader(),
     NYBitsLoader(),
     RenthopLoader(),

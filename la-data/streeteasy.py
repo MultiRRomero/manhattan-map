@@ -65,7 +65,6 @@ class StreeteasyLoader:
       start = section.rfind('>') + 1
       end = section.find(' ', start)
       listing.set_sqft(int(section[start:end].replace(',', '')))
-      print listing.sqft
 
     return (listing, s)
 
