@@ -5,6 +5,7 @@ var metersPerLng = 84426.94296769376;
 var axisTiltRadians = 29 * Math.PI/180;
 
 function initialize() {
+  debugger;
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 13,
     center: new google.maps.LatLng(40.75, -73.97),
