@@ -37,7 +37,7 @@ class NYBitsLoader:
 
   def load_data(self):
     listings = self._call_internets()
-    print ' ----- GOT %d LISTINGS ----- ' % len(listings)
+    print 'nybits has %d listings' % len(listings)
     return map(lambda listing: self._load_more_listing_data(listing), listings)
 
   def _get_url(self):

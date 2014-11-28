@@ -31,6 +31,11 @@ FEATURES = [
   'Elevator',
   'Fitness Center',
   ]
+NEIGHBORHOOD_FEATURES = [
+  FEATURES,
+  ['Doorman'],
+  ['Doorman'],
+  ]
 
 BASE_URL = 'http://www.renthop.com/search/new-york-city-ny?'
 
@@ -41,7 +46,7 @@ class RenthopLoader:
   def __init__(self):
     self._br = get_browser()
 
-  def _get_url(self, page=1):
+  def _get_url(self, neighborhood, page=1):
     nsids = []
     nsnames = []
     for id in CHOOSE_NEIGHBOORHOODS:
@@ -50,20 +55,20 @@ class RenthopLoader:
 
     params = [
       'bedrooms[]=1',
-      'neighborhoods_str=' + ','.join(nsids),
+      'neighborhoods_str=%d' % NEIGHBORHOOD_IDS[neighborhood],
       'sort=hopscore',
       'page=%d' % page,
       'search=0',
       ]
-    params += map(lambda i: 'neighborhoods[]=%s' % i, nsnames)
-    params += map(lambda i: 'features[]=%s' % i, FEATURES)
+    params += 'neighborhoods[]=%s' % NEIGHBORHOOD_NAMES[neighborhood]
+    params += map(lambda i: 'features[]=%s' % i, NEIGHBORHOOD_FEATURES[neighborhood])
     params += map(lambda i: '%s=on' % i, FILTERS)
 
     all = '&'.join(params).replace(' ', '%20')
     return BASE_URL + all
 
-  def _load_page(self, page):
-    s = open_page(self._br, self._get_url(page))
+  def _load_page(self, neighborhood, page):
+    s = open_page(self._br, self._get_url(neighborhood, page))
 
     (total_pages, s) = html_helper.advance_and_find(s, PAGE_PLACE_MARKER, 'of', '(')
     total_pages = int(total_pages.strip())
@@ -136,16 +141,20 @@ class RenthopLoader:
     listing.set_location(lat, long, address)
     listing.save_to_db()
 
-  def load_data(self):
-    (listings, total_pages) = self._load_page(1)
-    print 'renthop has %d pages' % total_pages
+  def _load_neighborhood_data(self, neighborhood):
+    (listings, total_pages) = self._load_page(neighborhood, 1)
+    print 'renthop has %d pages for %s' % (total_pages, NEIGHBORHOOD_NAMES[neighborhood])
 
     for page in range(2, total_pages + 1):
-      (page_listings, _) = self._load_page(page)
+      (page_listings, _) = self._load_page(neighborhood, page)
       listings += page_listings
 
     map(lambda i: self._load_details(i), listings)
     return listings
+
+  def load_data(self):
+    all_listings = [self._load_neighborhood_data(i) for i in range(len(NEIGHBORHOOD_NAMES))]
+    return reduce(lambda a, b: a + b, all_listings)
 
 if __name__ == '__main__':
   listings = RenthopLoader().load_data()
