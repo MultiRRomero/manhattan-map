@@ -100,7 +100,8 @@ class NYBitsLoader:
     pos = s.find(COMMENTS_MARKER)
     if pos >= 0:
       (blurb, s) = html_helper.find_in_between(s[pos:], ':', '<div class="cleanbreakdiv">')
-      listing.set_blurb(html_helper.strip_tags(blurb))
+      if blurb != None:
+        listing.set_blurb(html_helper.strip_tags(blurb))
 
     listing.save_to_db()
     return listing

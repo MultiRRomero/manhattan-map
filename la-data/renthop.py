@@ -94,15 +94,19 @@ class RenthopLoader:
     (_, s) = html_helper.advance_and_find(s, '<td', '', '<div')
     (recency, s) = html_helper.advance_and_find(s, '"bold font-size-100"', '>', '</div')
     recency = html_helper.strip_tags(recency).lower()
-    dt = self._understand_recency(recency)
+    dt = self._understand_recency(recency, url)
 
     listing = Apartment(SOURCE, title, price, url)
     listing.set_posting_timestamp(dt.strftime('%s'))
     return (listing, s)
 
-  def _understand_recency(self, recency):
+  def _understand_recency(self, recency, url):
     now = datetime.datetime.now()
-    number = int(recency.split(' ')[0])
+    try:
+      number = int(recency.split(' ')[0])
+    except:
+      print 'error parsing %s for %s' % (recency, url)
+      return now
 
     if 'sec' in recency:
       return now - datetime.timedelta(seconds=number)
