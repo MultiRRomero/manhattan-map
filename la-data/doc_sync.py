@@ -9,70 +9,80 @@ FILE = '.credentials.secret'
 SEEN_COL = 0
 URL_COL = 1
 
+NEW_WS_INDEX = 0
+NUM_WORKSHEETS = 5
+
 class DocSyncer:
   def __init__(self):
     self._credentials = self._get_credentials()
     self._last_seen = datetime.datetime.now().strftime('%d/%b %H:%M')
 
   def sync_listings(self, listings):
-    ws = self._get_worksheet()
-    sheet_data = self._get_sheet_data(ws)
+    worksheets = self._get_worksheets()
+    list_by_sheet = self._get_all_rows(worksheets)
 
-    by_url = self._get_diff(listings, sheet_data)
-    self._write_new_rows(ws, by_url)
-    self._update_seen_time(ws, by_url)
-    self._store_annotations(by_url)
+    listings_rows = map(lambda i: i.get_row_values(self._last_seen), listings)
+    keyed_new_data = self._index_by_url(listings_rows)
 
-  def _get_diff(self, listings, sheet_data):
+    self._write_new_rows(worksheets[NEW_WS_INDEX], keyed_new_data, list_by_sheet)
+    self._update_seen_times(worksheets, list_by_sheet, keyed_new_data)
+    self._store_annotations(list_by_sheet)
+
+  def _find_new_rows(self, new_data, old_data):
+    old_by_url = {}
+    for sheet in old_data:
+      for row in sheet:
+        old_by_url[row[URL_COL]] = row
+    missing = []
+    for url in new_data:
+      if not url in old_by_url:
+        missing.append(new_data[url])
+    return missing
+
+  def _index_by_url(self, data):
     by_url = {}
-    for listing in listings:
-      by_url[listing.url] = (listing, None)
-    for listing in sheet_data:
-      key = listing[URL_COL]
-      if key in by_url:
-        by_url[key] = (by_url[key][0], listing)
-      else:
-        by_url[key] = (None, listing)
+    for row in data:
+      by_url[row[URL_COL]] = row
     return by_url
 
-  def _write_new_rows(self, ws, by_url):
-    added = filter(lambda i: i[1] == None, by_url.values())
-    if len(added) == 0:
+  def _write_new_rows(self, ws, new_data, old_data_by_sheet):
+    new_rows = self._find_new_rows(new_data, old_data_by_sheet)
+    print 'found %d new rows' % len(new_rows)
+    if len(new_rows) == 0:
       return
-
-    added_values = map(lambda item: item[0].get_row_values(self._last_seen), added)
-    values = reduce(lambda a, b: a + b, added_values)
+    new_cells = reduce(lambda a, b: a + b, new_rows)
 
     cols = ws.col_values(1)
-    end = chr(ord('A') + len(added_values[0]) - 1)
-    list = ws.range('A%d:%s%d' % (len(cols) + 1, end, len(cols) + len(added)))
+    end = chr(ord('A') + len(new_rows[0]) - 1)
+    list = ws.range('A%d:%s%d' % (len(cols) + 1, end, len(cols) + len(new_rows)))
 
-    for i in range(len(values)):
-      list[i].value = values[i]
+    for i in range(len(new_cells)):
+      list[i].value = new_cells[i]
     ws.update_cells(list)
 
-  def _update_seen_time(self, ws, by_url):
-    cells = ws.range('A%d:B%d' % (2, len(by_url) + 1))
-    i = 0
-    while i < len(cells):
-      (seen_cell, url_cell) = cells[i:i+2]
-      i += 2
+  def _update_seen_times(self, worksheets, ws_data, new_data):
+    for i in range(len(worksheets)):
+      self._update_seen_time_for_sheet(worksheets[i], ws_data[i], new_data)
 
-      (listing, existing) = by_url[url_cell.value]
-      if listing != None:
-        seen_cell.value = self._last_seen
+  def _update_seen_time_for_sheet(self, ws, old_data, new_data):
+    if len(old_data) == 0:
+      return
+    cells = ws.range('A%d:A%d' % (2, len(old_data) + 1))
+
+    for i in range(len(cells)):
+      url = old_data[i][URL_COL]
+      if url in new_data:
+        cells[i].value = self._last_seen
     ws.update_cells(cells)
 
-  def _store_annotations(self, by_url):
+  def _store_annotations(self, data_by_sheet):
     now = int(datetime.datetime.now().strftime('%s'))
     annotations = []
-    for key in by_url:
-      (_, existing) = by_url[key]
-      if existing == None:
-        continue
-      url = existing[URL_COL]
-      (rating, comments, contacted) = existing[16:19]
-      annotations.append((now, url, int(rating), comments, contacted))
+    for sheet in data_by_sheet:
+      for row in sheet:
+        url = row[URL_COL]
+        (rating, comments, contacted) = row[16:19]
+        annotations.append((now, url, int(rating), comments, contacted))
     DBStore().save_annotations(annotations)
 
   def _get_credentials(self):
@@ -81,12 +91,17 @@ class DocSyncer:
     f.close()
     return s.strip().split(',')
 
-  def _get_worksheet(self):
+  def _get_worksheets(self):
     client = gspread.login(self._credentials[0], self._credentials[1])
     sheet = client.open_by_key(KEY)
-    return sheet.get_worksheet(0)
+    sheets = []
+    for i in range(NUM_WORKSHEETS):
+      sheets.append(sheet.get_worksheet(i))
+    return sheets
 
-  def _get_sheet_data(self, ws):
-    rows = ws.get_all_values()
-    return rows[1:] # Remove header row
-
+  def _get_all_rows(self, worksheets):
+    by_ws = []
+    for ws in worksheets:
+      rows = ws.get_all_values()
+      by_ws.append(rows[1:]) # Remove header row
+    return by_ws

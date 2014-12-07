@@ -81,3 +81,27 @@ TODO for spreadsheet:
 xx- renthop timestamp instead of date
 xx- blurbs are huge
 xx- distance in meters
+
+
+DATA TODO: 
+- filter renthop by price
+- remove featured=1 from streeteasy
+
+Spreadsheets:
+- Have 5 sheets: unprocessed, acceptible, bad, impossible, dups
+- We manually move stuff between sheets
+- Sheets actions:
+  - write new rows -> to unprocessed
+    - Need list of all URLs across sheets to do diff
+    - Need size of sheet 0 to know where to write
+  - update seen time -> to all sheets
+    - Just iterate over all cells, need new data indexed by URL
+  - store annotations -> from all sheets
+    - Iterate over all data
+-> on iteration, do those actions to all sheets
+- need:
+  - url-keyed new data
+  - need listing of all data to process what's new data
+    - for this, can temp index
+  
+
