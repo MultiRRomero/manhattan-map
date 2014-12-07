@@ -82,7 +82,7 @@ class DocSyncer:
       for row in sheet:
         url = row[URL_COL]
         (rating, comments, contacted) = row[16:19]
-        annotations.append((now, url, int(rating), comments, contacted))
+        annotations.append((now, url, float(rating), comments, contacted))
     DBStore().save_annotations(annotations)
 
   def _get_credentials(self):

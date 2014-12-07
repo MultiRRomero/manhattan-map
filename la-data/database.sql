@@ -30,7 +30,7 @@ CREATE TABLE if not exists search_log (
 CREATE TABLE if not exists annotations (
   timestamp INT NOT NULL,
   url TEXT NOT NULL,
-  rating INT,
+  rating REAL,
   comments TEXT,
   contacted TEXT
 );
