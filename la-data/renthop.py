@@ -78,7 +78,8 @@ class RenthopLoader:
       (listing, s) = self._find_listing(s)
       if listing == None:
         break
-      listings.append(listing)
+      if listing.price <= MAX_PRICE:
+        listings.append(listing)
     return (listings, total_pages)
 
   def _find_listing(self, s):

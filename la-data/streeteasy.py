@@ -75,7 +75,8 @@ class StreeteasyLoader:
       (listing, s) = self._get_result(s)
       if listing == None:
         break
-      listings.append(listing)
+      if not listing.url.endswith('featured=1'):
+        listings.append(listing)
 
     end = s.find("<i class='icon-caret-right'>")
     section = s[:end]
