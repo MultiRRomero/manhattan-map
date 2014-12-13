@@ -8,6 +8,7 @@ from renthop import RenthopLoader
 URLS = [
     'http://www.renthop.com/listings/east_63rd_street/9j/4921841',
     'http://www.renthop.com/listings/east_12th_street/7m/5000300',
+    'http://streeteasy.com/building/400-east-71-street-manhattan/4v',
     ]
 
 def main():
@@ -43,7 +44,7 @@ def main():
     db = DBStore()
 
     #    for i in range(len(lolsources)):
-    for i in range(1):
+    for i in range(2):
         source_brokers = lolsources[i].get_brokers(lollists[i])
         print source_brokers
         for url in source_brokers:

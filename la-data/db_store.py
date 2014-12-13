@@ -28,6 +28,7 @@ class DBStore:
        apartment.blurb,
        apartment.posting_date,
        apartment.sqft,
+       apartment.brokerage,
        apartment.broker)
       )
     self._conn.commit()
