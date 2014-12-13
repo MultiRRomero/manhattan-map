@@ -2,31 +2,31 @@ mkdir __install_tmp
 cd __install_tmp
 
 curl "https://pypi.python.org/packages/source/g/geopy/geopy-1.4.0.tar.gz#md5=e6955f6494cf2be9ab3d667d6092e13b" > geopy.tar.gz
-tar xvf geopy.tar.gz
+tar xvf geopy.tar.gz > /dev/null
 cd geopy-1.4.0
 python3.3 setup.py install --user
 cd ..
 
 curl "https://pypi.python.org/packages/source/a/argparse/argparse-1.1.zip#md5=087399b73047fa5a6482037411ddc968" > argparse.zip
-unzip argparse.zip
+unzip argparse.zip > /dev/null
 cd argparse-1.1
 python setup.py install --user
 cd ..
 
 curl "https://pypi.python.org/packages/source/m/mechanize/mechanize-0.2.5.tar.gz#md5=32657f139fc2fb75bcf193b63b8c60b2" > mechanize.tar.gz
-tar xvf mechanize.tar.gz
+tar xvf mechanize.tar.gz > /dev/null
 cd mechanize-0.2.5
 python setup.py install --user
 cd ..
 
 curl "https://pypi.python.org/packages/source/t/termcolor/termcolor-1.1.0.tar.gz#md5=043e89644f8909d462fbbfa511c768df" > termcolor.tar.gz
-tar xvf termcolor.tar.gz
+tar xvf termcolor.tar.gz > /dev/null
 cd termcolor-1.1.0
 python setup.py install --user
 cd ..
 
 curl "https://pypi.python.org/packages/source/g/gspread/gspread-0.2.2.tar.gz#md5=83148c97d7744c89d9a34d53766714d3" > gspread.tar.gz
-tar xvf gspread.tar.gz
+tar xvf gspread.tar.gz > /dev/null
 cd gspread-0.2.2
 python setup.py install --user
 cd ..

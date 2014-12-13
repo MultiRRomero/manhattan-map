@@ -20,7 +20,8 @@ CREATE TABLE if not exists apartments (
   blurb TEXT,
   posting_date VARCHAR(255),
   sqft INT,
-  broker VARCHAR(1024)
+  broker VARCHAR(1024),
+  brokerage VARCHAR(1024)
 );
 
 CREATE TABLE if not exists search_log (

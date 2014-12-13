@@ -35,6 +35,7 @@ class Apartment:
       self.stop_distance = None
       self.stop = None
       self.broker = None
+      self.brokerage = None
       self._has_full_data = False
     else:
       self._init_address_from_db(data[0])
@@ -43,6 +44,7 @@ class Apartment:
       self.posting_date = data[3]
       self.sqft = data[4]
       self.broker = data[5]
+      self.brokerage = data[6]
       self._has_full_data = True
 
   def _init_address_from_db(self, address_id):
@@ -99,6 +101,10 @@ class Apartment:
 
   def set_broker(self, broker):
     self.broker = broker
+    return self
+
+  def set_brokerage(self, brokerage):
+    self.brokerage = brokerage
     return self
 
   def set_posting_timestamp(self, timestamp):
