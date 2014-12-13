@@ -6,11 +6,6 @@ from streeteasy import StreeteasyLoader
 from renthop import RenthopLoader
 
 URLS = [
-    'http://www.renthop.com/listings/east_63rd_street/9j/4921841',
-    'http://www.renthop.com/listings/east_12th_street/7m/5000300',
-    'http://streeteasy.com/building/400-east-71-street-manhattan/4v',
-    'http://www.nybits.com/apartmentlistings/3d98d5a9d801d09aa29d61b0423bd26b.html',
-    'http://newyork.craigslist.org/mnh/nfb/4758687590.html',
     ]
 
 def main():

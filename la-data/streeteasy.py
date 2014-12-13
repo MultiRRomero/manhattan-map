@@ -92,6 +92,7 @@ class StreeteasyLoader:
     if listing.is_fully_loaded():
       return
     s = open_page(self._br, listing.url)
+    if 'This unit is not currently listed on StreetEasy' in s: return
 
     (days, s) = html_helper.advance_and_find(s, '<h6>Days On Market</h6>', 'p>', ' day')
     post_timestamp = self._get_post_timestamp(days)
@@ -119,6 +120,7 @@ class StreeteasyLoader:
 
   def _get_post_timestamp(self, days):
     now = datetime.datetime.now()
+    days = days if days != None else 100
     return int((now - datetime.timedelta(days=int(days))).strftime('%s'))
 
   def get_brokers(self, listings):

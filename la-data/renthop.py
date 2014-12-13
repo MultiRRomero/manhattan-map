@@ -128,10 +128,12 @@ class RenthopLoader:
       return
     s = open_page(self._br, listing.url)
 
-    (broker, s) = html_helper.advance_and_find(s, 'Save to Favorites', '<span class="bold">', '</span>')
-    (brokerage, s) = html_helper.advance_and_find(s, 'Brokerage: ', '<span class="bold"', '</span>')
-    if brokerage and len(brokerage) > 0:
-      brokerage = brokerage[1:]
+    (broker, brokerage) = ('', '')
+    if 'Brokerage:' in s:
+      (broker, s) = html_helper.advance_and_find(s, 'Save to Favorites', '<span class="bold">', '</span>')
+      (brokerage, s) = html_helper.advance_and_find(s, 'Brokerage: ', '<span class="bold"', '</span>')
+      if brokerage and len(brokerage) > 0:
+        brokerage = brokerage[1:]
 
     (features, s) = html_helper.find_in_between(s, 'Features &amp; Amenities', '<div style="width: 640px')
     blurb = html_helper.strip_tags(features.replace('<td', '\n<td'))
