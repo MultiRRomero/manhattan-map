@@ -81,7 +81,7 @@ class DocSyncer:
     for sheet in data_by_sheet:
       for row in sheet:
         url = row[URL_COL]
-        (rating, comments, contacted) = row[16:19]
+        (rating, comments, contacted) = row[18:21]
         annotations.append((now, url, float(rating), comments, contacted))
     DBStore().save_annotations(annotations)
 

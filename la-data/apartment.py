@@ -129,6 +129,7 @@ class Apartment:
   price, title, stop distance, stop,
   posting date, has fee, sqft,
   fitness, a/c, doorman, elevator, laundry,
+  broker, brokerage,
   adddress, lat/long,
   our_rating, comments, contacted
   """
@@ -149,6 +150,8 @@ class Apartment:
       int('doorman' in blurb or self.source == 'nybits'),
       int('elevator' in blurb),
       int('laundry' in blurb),
+      self.broker if self.broker else '?',
+      self.brokerage if self.brokerage else '?',
       self.address,
       '%s,%s' % (str(self.latitude), str(self.longitude)),
       '0', # rating
