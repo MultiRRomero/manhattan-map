@@ -13,7 +13,8 @@ METERS_IN_MILE = 1609.344
 db = DBStore()
 
 class Apartment:
-  def __init__(self, source, title, price, url):
+  def __init__(self, source, title, price, url, raw=False):
+    self._raw = raw
     self.title = title
     self.price = price
     self.url = url
@@ -23,7 +24,7 @@ class Apartment:
   def _init_from_db(self):
     global db
     data = db.get_apartment_full_data(self.url)
-    if data == None:
+    if self._raw or data == None:
       self.latitude = None
       self.longitude = None
       self.address = None
@@ -71,6 +72,8 @@ class Apartment:
     return self._has_full_data
 
   def save_to_db(self):
+    if self._raw: return
+
     global db
     self._has_full_data = True
     db.save_apartment(self)

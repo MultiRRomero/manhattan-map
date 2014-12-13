@@ -159,6 +159,13 @@ class RenthopLoader:
     map(lambda i: self._load_details(i), listings)
     return listings
 
+  def get_brokers(self, listings):
+    brokers = {}
+    for listing in listings:
+      self._load_details(listing)
+      brokers[listing.url] = (listing.broker, '') # TODO: brokerage
+    return brokers
+
   def load_data(self):
     all_listings = [self._load_neighborhood_data(i) for i in range(len(NEIGHBORHOOD_NAMES))]
     return reduce(lambda a, b: a + b, all_listings)

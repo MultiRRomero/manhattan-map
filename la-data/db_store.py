@@ -86,6 +86,13 @@ class DBStore:
     results = cursor.fetchone()
     return None if results == None else results[0]
 
+  def update_broker(self, url, data):
+    self._conn.execute(
+      'UPDATE apartments SET (broker=?, brokerage=?) WHERE url=?'
+      (url, data[0], data[1])
+      )
+    self._conn.commit()
+
   def save_annotations(self, annotations):
     self._conn.executemany(
       'INSERT INTO annotations ' +
