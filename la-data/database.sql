@@ -19,7 +19,8 @@ CREATE TABLE if not exists apartments (
   has_fee BOOLEAN,
   blurb TEXT,
   posting_date VARCHAR(255),
-  sqft INT
+  sqft INT,
+  broker VARCHAR(1024)
 );
 
 CREATE TABLE if not exists search_log (

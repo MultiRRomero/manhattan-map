@@ -83,6 +83,19 @@ xx- blurbs are huge
 xx- distance in meters
 
 
+
+TO GET BROKERS:
+1. get all URLs
+2. modify classes to print_broker for list of URLs
+3. STOP CRON
+4. add to spreadsheet manually
+5. update program to expect that column - both output to it for new listings && adjust annotations column
+6. START CRON
+
+- OR -
+update to DB when don't have the broker
+
+
 DATA TODO: 
 - filter renthop by price
 - remove featured=1 from streeteasy

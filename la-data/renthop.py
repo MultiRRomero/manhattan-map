@@ -128,6 +128,7 @@ class RenthopLoader:
       return
     s = open_page(self._br, listing.url)
 
+    (broker, s) = html_helper.advance_and_find(s, 'Save to Favorites', '<span class="bold">', '</span>')
     (features, s) = html_helper.find_in_between(s, 'Features &amp; Amenities', '<div style="width: 640px')
     blurb = html_helper.strip_tags(features.replace('<td', '\n<td'))
 
@@ -144,6 +145,7 @@ class RenthopLoader:
     (lat, s) = html_helper.find_in_between(s, "latitude = '", "'")
     address = get_address(lat, long)
     listing.set_location(lat, long, address)
+    listing.set_broker(broker)
     listing.save_to_db()
 
   def _load_neighborhood_data(self, neighborhood):
