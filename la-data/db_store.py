@@ -87,10 +87,10 @@ class DBStore:
     results = cursor.fetchone()
     return None if results == None else results[0]
 
-  def update_broker(self, url, data):
-    self._conn.execute(
-      'UPDATE apartments SET (broker=?, brokerage=?) WHERE url=?'
-      (url, data[0], data[1])
+  def update_broker(self, url, broker, brokerage):
+    cursor = self._conn.execute(
+      'UPDATE apartments SET broker=?, brokerage=? WHERE url=?',
+      (broker, brokerage, url)
       )
     self._conn.commit()
 
