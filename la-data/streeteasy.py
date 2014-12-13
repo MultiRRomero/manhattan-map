@@ -96,6 +96,10 @@ class StreeteasyLoader:
     (days, s) = html_helper.advance_and_find(s, '<h6>Days On Market</h6>', 'p>', ' day')
     post_timestamp = self._get_post_timestamp(days)
 
+    (broker_stuff, s) = html_helper.find_in_between(s, 'Listed at', "<div class='closer'></div>")
+    broker_stuff = html_helper.strip_tags(broker_stuff.replace('\n', ' '))
+    (brokerage, broker) = broker_stuff.split(' by ')
+
     (descr, s) = html_helper.find_in_between(s, '<h2>Description</h2>', '</section>')
     descr = html_helper.strip_tags(descr)
 
@@ -107,6 +111,8 @@ class StreeteasyLoader:
 
     listing.set_blurb(descr + '\n\n' + amenities)
     listing.set_posting_timestamp(post_timestamp)
+    listing.set_broker(broker)
+    listing.set_brokerage(brokerage)
     listing.save_to_db()
 
   def _get_post_timestamp(self, days):
