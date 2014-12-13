@@ -16,8 +16,9 @@ class DBStore:
   def save_apartment(self, apartment):
     self._conn.execute(
       'INSERT INTO apartments ' +
-      '(source, title, price, url, address_id, has_fee, blurb, posting_date, sqft, broker) ' +
-      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
+      '(source, title, price, url, address_id,' +
+      ' has_fee, blurb, posting_date, sqft, broker, brokerage) ' +
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ',
       (apartment.source,
        apartment.title,
        apartment.price,
@@ -44,7 +45,7 @@ class DBStore:
 
   def get_apartment_full_data(self, url):
     cursor = self._conn.execute(
-      'SELECT address_id, has_fee, blurb, posting_date, sqft, broker ' +
+      'SELECT address_id, has_fee, blurb, posting_date, sqft, broker, brokerage ' +
       'FROM apartments WHERE url=?',
       (url, )
       )
