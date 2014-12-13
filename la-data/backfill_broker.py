@@ -10,6 +10,7 @@ URLS = [
     'http://www.renthop.com/listings/east_12th_street/7m/5000300',
     'http://streeteasy.com/building/400-east-71-street-manhattan/4v',
     'http://www.nybits.com/apartmentlistings/3d98d5a9d801d09aa29d61b0423bd26b.html',
+    'http://newyork.craigslist.org/mnh/nfb/4758687590.html',
     ]
 
 def main():
@@ -35,7 +36,7 @@ def main():
             streeteasy.append(mock_listing)
         elif 'nybits.com' in url:
             nybits.append(mock_listing)
-        elif 'craigslist.com' in url:
+        elif 'craigslist.org' in url:
             craigslist.append(mock_listing)
         else:
             print 'wtf???????', url
@@ -44,10 +45,8 @@ def main():
     brokers = {}
     db = DBStore()
 
-    #    for i in range(len(lolsources)):
-    for i in range(3):
+    for i in range(len(lolsources)):
         source_brokers = lolsources[i].get_brokers(lollists[i])
-        print source_brokers
         for url in source_brokers:
             brokers[url] = source_brokers[url]
             db.update_broker(url, source_brokers[url][0], source_brokers[url][1])

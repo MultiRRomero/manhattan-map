@@ -29,6 +29,12 @@ class CLDataLoader:
   def load_data(self):
     return self._load_data_fee(Fees.NO_FEE) + self._load_data_fee(Fees.FEE)
 
+  def get_brokers(self, listings):
+    brokers = {}
+    for listing in listings:
+      brokers[listing.url] = ('', '')
+    return brokers
+
   def _form_params(self):
     params = map(lambda nh: 'nh=%d' % nh, NEIGHBORHOODS)
     params.append('query=%s' % SEARCH_QUERY)
