@@ -42,6 +42,13 @@ class NYBitsLoader:
     print 'nybits has %d listings' % len(listings)
     return map(lambda listing: self._load_more_listing_data(listing), listings)
 
+  def get_brokers(self, listings):
+    brokers = {}
+    for listing in listings:
+      self._load_more_listing_data(listing)
+      brokers[listing.url] = (listing.broker, listing.brokerage)
+    return brokers
+
   def _get_url(self):
     params = [URL] + map(lambda i: '!!nsearch=%s' % i, NEIGHBORHOODS)
     return '&'.join(params)
@@ -101,11 +108,15 @@ class NYBitsLoader:
 
     s = s[s.find(BRKG_MARKER):]
     (brokerage, s) = html_helper.find_in_between(s, COL_START, COL_END)
-    listing.set_brokerage(brokerage)
+    if brokerage:
+      brokerage = html_helper.strip_tags(brokerage)
+      listing.set_brokerage(brokerage)
 
     s = s[s.find(BRKR_MARKER):]
     (broker, s) = html_helper.find_in_between(s, COL_START, COL_END)
-    listing.set_broker(broker)
+    if broker:
+      broker = html_helper.strip_tags(broker)
+      listing.set_broker(broker)
 
     pos = s.find(COMMENTS_MARKER)
     if pos >= 0:
