@@ -28,6 +28,8 @@ COL_END = '</td>'
 BREAK = '<br>'
 SQFT_MARKER = 'Size (sq/ft)'
 BLDG_MARKER = '<b>Building</b>'
+BRKG_MARKER = '<b>Listing Source</b>'
+BRKR_MARKER = '<b>Contact</b>'
 COMMENTS_MARKER = '<b>Comments</b>'
 
 class NYBitsLoader:
@@ -96,6 +98,14 @@ class NYBitsLoader:
     s = s[s.find(BLDG_MARKER):]
     (address, s) = html_helper.find_in_between(s, COL_START, COL_END)
     self._set_formatted_address(address, listing)
+
+    s = s[s.find(BRKG_MARKER):]
+    (brokerage, s) = html_helper.find_in_between(s, COL_START, COL_END)
+    listing.set_brokerage(brokerage)
+
+    s = s[s.find(BRKR_MARKER):]
+    (broker, s) = html_helper.find_in_between(s, COL_START, COL_END)
+    listing.set_broker(broker)
 
     pos = s.find(COMMENTS_MARKER)
     if pos >= 0:
